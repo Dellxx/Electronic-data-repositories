@@ -162,3 +162,4 @@ FROM public.e_commerce_customer_segmentation
 GROUP BY 1, gender
 ORDER BY age_group, gender;
 
+
