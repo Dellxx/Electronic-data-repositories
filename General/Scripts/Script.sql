@@ -2,14 +2,14 @@ SELECT
     device_preference,
     shopping_channel,
     preferred_category_1,
+    social_media_presence, 
     COUNT(customer_id) AS young_customers_count,
-    ROUND(AVG(avg_order_value_usd)::numeric, 2) AS avg_aov,
-    ROUND(AVG(conversion_rate)::numeric, 2) AS avg_conversion_rate,
-    ROUND(AVG(social_media_presence)::numeric, 2) AS avg_social_presence,
-    ROUND(AVG(click_through_rate)::numeric, 2) AS avg_ctr
+    ROUND(AVG(avg_order_value_usd::numeric)::numeric, 2) AS avg_aov,
+    ROUND(AVG(conversion_rate::numeric)::numeric, 2) AS avg_conversion_rate,
+    ROUND(AVG(click_through_rate::numeric)::numeric, 2) AS avg_ctr
 FROM public.e_commerce_customer_segmentation
 WHERE age BETWEEN 18 AND 24 OR age_group = '18-24'
-GROUP BY device_preference, shopping_channel, preferred_category_1
+GROUP BY device_preference, shopping_channel, preferred_category_1, social_media_presence
 ORDER BY young_customers_count DESC;
 
 /*Фильтровал клиентов 18–24 лет и сортировал по общим тратам.
@@ -19,6 +19,25 @@ ORDER BY young_customers_count DESC;
 
 ----------------------
 
+SELECT 
+    device_preference,
+    shopping_channel,
+    preferred_category_1,
+    social_media_presence,
+    COUNT(customer_id) AS student_count,
+    ROUND(AVG(NULLIF(REPLACE(avg_order_value_usd::text, '%', ''), '')::numeric), 2) AS avg_aov,
+    ROUND(AVG(NULLIF(REPLACE(conversion_rate::text, '%', ''), '')::numeric), 2) AS avg_conversion_rate,
+    ROUND(AVG(NULLIF(REPLACE(click_through_rate::text, '%', ''), '')::numeric), 2) AS avg_ctr
+FROM public.e_commerce_customer_segmentation
+WHERE LOWER(employment_type) = 'student'
+GROUP BY 
+    device_preference, 
+    shopping_channel, 
+    preferred_category_1, 
+    social_media_presence
+ORDER BY student_count DESC;
+
+----------------------
 SELECT 
     MIN(avg_order_value_usd) AS min_aov,
     MAX(avg_order_value_usd) AS max_aov,
